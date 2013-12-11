@@ -4,6 +4,7 @@ import os
 import json
 import logging
 import handlers
+import components
 from urllib import quote, urlencode
 
 from google.appengine.api import urlfetch
@@ -21,5 +22,7 @@ class MainPage(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                 webapp2.Route(r'/reviews/stars/<max_or_min>/<star_value>', handler = handlers.StarRated),
-                                webapp2.Route(r'/reviews/stars/<star_value>', handler = handlers.StarRated)],
+                                webapp2.Route(r'/reviews/stars/<star_value>', handler = handlers.StarRated),
+                                webapp2.Route(r'/components/bestandworstincinema/<quantity>', handler=components.BestAndWorstInCinema)
+                                ],
                               debug=True)
