@@ -1,7 +1,3 @@
-#consume the data feed
-#shuffle
-#restrict to x
-#render html
 import os
 import jinja2
 import webapp2
@@ -22,4 +18,14 @@ class BestAndWorstInCinema(webapp2.RequestHandler):
         reviews.extend(five_star[:int(quantity)])
         reviews.extend(one_star[:int(quantity)])
 
+        for r in reviews:
+            contributors = []
+            tags = r.get('tags')
+            for tag in tags:
+                if tag.get('type') == 'contributor':
+                    contributors.append(tag.get('webTitle'))
+                    r['contributors'] = " ".join(contributors)
+
         self.response.out.write(template.render({'reviews':reviews}))
+
+
