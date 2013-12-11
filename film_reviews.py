@@ -1,4 +1,5 @@
 import logging
+import random
 from google.appengine.api import memcache
 import content_api
 
@@ -30,3 +31,12 @@ def filtered_reviews(max_or_min=None,star_value=None):
             filtered_reviews = sorted(filtered_reviews,key=lambda x:x['fields']['starRating'])
         memcache.set(star_query, filtered_reviews, 15*60)
     return filtered_reviews
+
+def best_and_worst(quantity):
+    best = filtered_reviews('min', '4')[:int(quantity)]
+    worst = filtered_reviews('max', '2')[:int(quantity)]
+    reviews = []
+    map(random.shuffle, [best, worst])
+    reviews.extend(best)
+    reviews.extend(worst)
+    return reviews

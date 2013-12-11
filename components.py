@@ -10,13 +10,9 @@ jinja_environment = jinja2.Environment(
 
 class BestAndWorstInCinema(webapp2.RequestHandler):
     def get(self, quantity):
-        five_star = film_reviews.filtered_reviews('min', '5')
-        one_star = film_reviews.filtered_reviews('max', '1')
+
         template = jinja_environment.get_template('bestandworstincinema.html')
-        reviews = []
-        map(random.shuffle, [five_star, one_star])
-        reviews.extend(five_star[:int(quantity)])
-        reviews.extend(one_star[:int(quantity)])
+        reviews = film_reviews.best_and_worst(int(quantity))
 
         for r in reviews:
             contributors = []
