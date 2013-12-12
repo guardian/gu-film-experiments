@@ -3,5 +3,7 @@
 <microapp interface-version="1" version="1.0">
   <components>
     <component-definition display-name="Best and worst in cinema (content bottom)" name="bestandworstincinemacontent" path="/components/bestandworstincinema/2" widths="460,620"/>
+    <component-definition display-name="Best and worst in cinema (front)" name="bestandworstincinemafront" path="/components/bestandworstincinema/1" widths="300"/>
+  </components>
   </components>
 </microapp>
