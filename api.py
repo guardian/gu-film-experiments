@@ -46,6 +46,7 @@ class StarReviewHandler(webapp2.RequestHandler):
 			current_review.put()
 
 		headers.json(self.request)
+		headers.cors(self.request)
 		self.response.out.write(json.dumps(data))
 
 app = webapp2.WSGIApplication([('/api/star-review', StarReviewHandler)],
