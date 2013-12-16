@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Film reports{% endblock %}
+
+{% block content %}
+
+<div class="container">
+	<div class="col-md-12">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Film id</th>
+					<th>Average rating</th>
+					<th>Max rating</th>
+					<th>Min rating</th>
+					<th>Reviews</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for review_summary in reviews %}
+				<tr>
+					<td>{{review_summary.film_id}}</td>
+					<td>{{review_summary.average_rating}}</td>
+					<td>{{review_summary.max_rating}}</td>
+					<td>{{review_summary.min_rating}}</td>
+					<td>{{review_summary.ratings}}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+{% endblock %}

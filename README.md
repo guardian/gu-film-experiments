@@ -1,7 +1,6 @@
-simply-py
-=========
+# Guardian Film experiments
 
-A simple blueprint for creating python apps in Google App Engine
+This project defines experimental components and functionality for use in the Guardian Film section.
 
 ## Creating configuration data
 

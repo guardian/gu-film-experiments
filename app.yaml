@@ -9,6 +9,10 @@ handlers:
   static_dir: static
 - url: /api/.*
   script: api.app
+- url: /reports/.*
+  script: report_pages.app
+- url: /components/.*
+  script: components.app
 - url: /.*
   script: app.app
 

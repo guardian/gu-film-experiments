@@ -6,22 +6,32 @@ import logging
 import random
 
 jinja_environment = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
+	loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
 
 class BestAndWorstInCinema(webapp2.RequestHandler):
-    def get(self, quantity):
+	def get(self, quantity):
 
-        template = jinja_environment.get_template('bestandworstincinema.html')
-        reviews = film_reviews.best_and_worst(int(quantity))
+		template = jinja_environment.get_template('bestandworstincinema.html')
+		reviews = film_reviews.best_and_worst(int(quantity))
 
-        for r in reviews:
-            contributors = []
-            tags = r.get('tags')
-            for tag in tags:
-                if tag.get('type') == 'contributor':
-                    contributors.append(tag.get('webTitle'))
-                    r['contributors'] = " ".join(contributors)
+		for r in reviews:
+			contributors = []
+			tags = r.get('tags')
+			for tag in tags:
+				if tag.get('type') == 'contributor':
+					contributors.append(tag.get('webTitle'))
+					r['contributors'] = " ".join(contributors)
 
-        self.response.out.write(template.render({'reviews':reviews}))
+		self.response.out.write(template.render({'reviews':reviews}))
 
+class StarReview(webapp2.RequestHandler):
+	def get(self):
+		template = jinja_environment.get_template('star-review.html')
 
+		self.response.out.write(template.render({}))
+
+app = webapp2.WSGIApplication([
+	webapp2.Route(r'/components/star-review', handler=StarReview),
+	webapp2.Route(r'/components/bestandworstincinema/<quantity>', handler=BestAndWorstInCinema),
+	],
+	debug=True)
