@@ -4,7 +4,7 @@ from google.appengine.api import memcache
 import content_api
 
 def filtered_reviews(max_or_min=None,star_value=None):
-    logging.info(star_value)
+    #logging.info(star_value)
     min = max_or_min == 'min'
     if min:
         star_query = "reviews_gte_%s" % str(star_value)
@@ -21,7 +21,7 @@ def filtered_reviews(max_or_min=None,star_value=None):
             all_reviews = content_api.read_all()
             memcache.set('data_reviews', all_reviews, 15*60)
         if min:
-            logging.info('calling the min function')
+            #logging.info('calling the min function')
             filtered_reviews = [r for r in all_reviews if r['fields']['starRating'] >= star_value]
             filtered_reviews = sorted(filtered_reviews,key=lambda x:x['webPublicationDate'], reverse=True)
             filtered_reviews = sorted(filtered_reviews,key=lambda x:x['fields']['starRating'], reverse=True)
@@ -33,10 +33,14 @@ def filtered_reviews(max_or_min=None,star_value=None):
     return filtered_reviews
 
 def best_and_worst(quantity):
-    best = filtered_reviews('min', '4')[:int(quantity)]
-    worst = filtered_reviews('max', '2')[:int(quantity)]
+    limit = int(quantity)
     reviews = []
-    map(random.shuffle, [best, worst])
-    reviews.extend(best)
-    reviews.extend(worst)
+    best_reviews = filtered_reviews('min', '4')
+    reviews.extend(best_reviews[0:1])
+
+    rest_of_the_best  = sorted(best_reviews[1:], key=lambda x: random.random()) 
+    worst_reviews = sorted(filtered_reviews('max', '2'), key=lambda x: random.random())[:limit]
+
+    reviews.extend(rest_of_the_best[:limit - 1])
+    reviews.extend(worst_reviews)
     return reviews
