@@ -36,11 +36,10 @@ def best_and_worst(quantity):
     limit = int(quantity)
     reviews = []
     best_reviews = filtered_reviews('min', '4')
-    reviews.extend(best_reviews[0:1])
-
-    rest_of_the_best  = sorted(best_reviews[1:], key=lambda x: random.random()) 
+    
+    best_of_the_best  = sorted(best_reviews[1:], key=lambda x: random.random())[:limit]
     worst_reviews = sorted(filtered_reviews('max', '2'), key=lambda x: random.random())[:limit]
 
-    reviews.extend(rest_of_the_best[:limit - 1])
+    reviews.extend(best_of_the_best)
     reviews.extend(worst_reviews)
     return reviews
