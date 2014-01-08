@@ -14,10 +14,17 @@ import headers
 
 from models import StarReview, StarReviewSummary
 
-Summary = namedtuple('StarSummary', ['film_id', 'average_rating', 'max_rating', 'min_rating', 'ratings'])
-
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
+
+def summary_model_to_dict(summary):
+	return {
+		"movie_id" : summary.movie_id,
+		"average_rating" : summary.average_rating,
+		"max_rating" : summary.max_rating,
+		"min_rating" : summary.min_rating,
+		"ratings" : summary.ratings,
+	}
 
 class StarReviewHandler(webapp2.RequestHandler):
 	def post(self):
@@ -53,11 +60,16 @@ class StarReviewHandler(webapp2.RequestHandler):
 		reviews = StarReview.query(StarReview.movie_id == movie_id)
 
 		ratings = [review.stars for review in reviews]
-		summary = Summary(movie_id, sum(ratings) / len(ratings), max(ratings), min(ratings), len(ratings))
+		summary = StarReviewSummary(movie_id=movie_id,
+			average_rating = sum(ratings) / len(ratings),
+			max_rating = max(ratings),
+			min_rating = min(ratings),
+			ratings = len(ratings))
+		summary.put()
 
 		logging.info(summary)
 
-		data['summary'] = summary
+		data['summary'] = summary_model_to_dict(summary)
 
 		headers.json(self.request)
 		headers.cors(self.request)
