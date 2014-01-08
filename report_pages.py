@@ -16,6 +16,7 @@ from models import StarReview
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
 
+
 class FilmReports(webapp2.RequestHandler):
 	def get(self):
 		template = jinja_environment.get_template('reports.html')
@@ -24,13 +25,25 @@ class FilmReports(webapp2.RequestHandler):
 
 		Summary = namedtuple('StarSummary', ['film_id', 'average_rating', 'max_rating', 'min_rating', 'ratings'])
 
-		def summarise(summaries, review):
+		def ratings_reducer(summaries, review):
+			logging.info(summaries)
 			if not review.movie_id in summaries:
-				summaries[review.movie_id] = Summary(review.movie_id, review.stars, review.stars, review.stars, 1)
+				summaries[review.movie_id] = [review.stars]
+				return summaries
+
+			summaries[review.movie_id].append(review.stars)
 
 			return summaries
-		summaries = reduce(summarise, reviews, {})
-		summaries = sorted(summaries.values(), key=attrgetter('average_rating'), reverse=True)
+
+		ratings = reduce(ratings_reducer, reviews, {})
+
+		def summary_gen(movie_id, ratings_list):
+
+			return Summary(movie_id, sum(ratings_list) / len(ratings_list), max(ratings_list), min(ratings_list), len(ratings_list))
+
+		summaries = [summary_gen(k, v) for k,v in ratings.items()]
+		summaries = sorted(summaries, key=attrgetter('average_rating'), reverse=True)
+
 		logging.info(summaries)
 
 		template_values = {"reviews" : summaries}

@@ -5,11 +5,16 @@ import os
 import json
 import logging
 from urllib import quote, urlencode
+from collections import namedtuple
+from operator import attrgetter
+
 from google.appengine.api import urlfetch
 
 import headers
 
-from models import StarReview
+from models import StarReview, StarReviewSummary
+
+Summary = namedtuple('StarSummary', ['film_id', 'average_rating', 'max_rating', 'min_rating', 'ratings'])
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
@@ -44,6 +49,15 @@ class StarReviewHandler(webapp2.RequestHandler):
 			current_review = query.iter().next()
 			current_review.stars = stars
 			current_review.put()
+
+		reviews = StarReview.query(StarReview.movie_id == movie_id)
+
+		ratings = [review.stars for review in reviews]
+		summary = Summary(movie_id, sum(ratings) / len(ratings), max(ratings), min(ratings), len(ratings))
+
+		logging.info(summary)
+
+		data['summary'] = summary
 
 		headers.json(self.request)
 		headers.cors(self.request)
