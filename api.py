@@ -9,6 +9,7 @@ from collections import namedtuple
 from operator import attrgetter
 
 from google.appengine.api import urlfetch
+from google.appengine.ext import ndb
 
 import headers
 
@@ -60,11 +61,28 @@ class StarReviewHandler(webapp2.RequestHandler):
 		reviews = StarReview.query(StarReview.movie_id == movie_id)
 
 		ratings = [review.stars for review in reviews]
-		summary = StarReviewSummary(movie_id=movie_id,
-			average_rating = sum(ratings) / len(ratings),
-			max_rating = max(ratings),
-			min_rating = min(ratings),
-			ratings = len(ratings))
+
+		summary_key = ndb.Key('StarReviewSummary', movie_id)
+
+		summary = summary_key.get()
+
+		if ratings and summary:
+			average_rating = int(sum(ratings) / len(ratings))
+			summary.average_rating = average_rating
+			summary.max_rating = max(ratings)
+			summary.min_rating = min(ratings)
+			summary.ratings = len(ratings)
+		
+		if ratings and not summary:			
+			summary = StarReviewSummary(id=movie_id, movie_id=movie_id,
+				average_rating = sum(ratings) / len(ratings),
+				max_rating = max(ratings),
+				min_rating = min(ratings),
+				ratings = len(ratings))
+		
+		if not ratings and not summary:
+			summary = StarReviewSummary(id=movie_id, movie_id=movie_id, average_rating=stars, max_rating=stars, min_rating=stars, ratings=1)
+
 		summary.put()
 
 		logging.info(summary)

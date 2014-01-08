@@ -11,7 +11,7 @@ from operator import attrgetter
 
 from google.appengine.api import urlfetch
 
-from models import StarReview
+from models import StarReview, StarReviewSummary
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
@@ -45,6 +45,8 @@ class FilmReports(webapp2.RequestHandler):
 		summaries = sorted(summaries, key=attrgetter('average_rating'), reverse=True)
 
 		logging.info(summaries)
+
+		summaries = sorted([s for s in StarReviewSummary.query()], key=attrgetter('average_rating'), reverse=True)
 
 		template_values = {"reviews" : summaries}
 
