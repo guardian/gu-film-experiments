@@ -66,22 +66,27 @@ class StarReviewHandler(webapp2.RequestHandler):
 
 		summary = summary_key.get()
 
-		if ratings and summary:
-			average_rating = int(sum(ratings) / len(ratings))
-			summary.average_rating = average_rating
-			summary.max_rating = max(ratings)
-			summary.min_rating = min(ratings)
-			summary.ratings = len(ratings)
+		# Screw you eventual consistency!
+		ratings.append(int(stars))
+
 		
-		if ratings and not summary:			
+		if not summary:
+			summary = StarReviewSummary(id=movie_id, movie_id=movie_id, average_rating=stars, max_rating=stars, min_rating=stars, ratings=1)
+		
+		if len(ratings) > 1 and not summary:
+			# Recover from previous failure to generate summary			
 			summary = StarReviewSummary(id=movie_id, movie_id=movie_id,
 				average_rating = sum(ratings) / len(ratings),
 				max_rating = max(ratings),
 				min_rating = min(ratings),
 				ratings = len(ratings))
-		
-		if not ratings and not summary:
-			summary = StarReviewSummary(id=movie_id, movie_id=movie_id, average_rating=stars, max_rating=stars, min_rating=stars, ratings=1)
+
+		if summary:
+			average_rating = int(sum(ratings) / len(ratings))
+			summary.average_rating = average_rating
+			summary.max_rating = max(ratings)
+			summary.min_rating = min(ratings)
+			summary.ratings = len(ratings)
 
 		summary.put()
 
