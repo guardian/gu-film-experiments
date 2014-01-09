@@ -49,10 +49,15 @@ class StarReviewHandler(webapp2.RequestHandler):
 			'movie_id' : movie_id
 			}
 
+		ratings = []
+
 		query = StarReview.query(StarReview.movie_id == movie_id, StarReview.ip_address == self.request.remote_addr)
 
 		if not query.iter().has_next():
 			StarReview(movie_id=movie_id, stars=stars, ip_address=self.request.remote_addr).put()
+
+			# Screw you eventual consistency!
+			ratings.append(int(stars))
 		else:
 			current_review = query.iter().next()
 			current_review.stars = stars
@@ -60,15 +65,11 @@ class StarReviewHandler(webapp2.RequestHandler):
 
 		reviews = StarReview.query(StarReview.movie_id == movie_id)
 
-		ratings = [review.stars for review in reviews]
+		ratings.extend([review.stars for review in reviews])
 
 		summary_key = ndb.Key('StarReviewSummary', movie_id)
 
 		summary = summary_key.get()
-
-		# Screw you eventual consistency!
-		ratings.append(int(stars))
-
 		
 		if not summary:
 			summary = StarReviewSummary(id=movie_id, movie_id=movie_id, average_rating=stars, max_rating=stars, min_rating=stars, ratings=1)
@@ -89,8 +90,6 @@ class StarReviewHandler(webapp2.RequestHandler):
 			summary.ratings = len(ratings)
 
 		summary.put()
-
-		logging.info(summary)
 
 		data['summary'] = summary_model_to_dict(summary)
 
