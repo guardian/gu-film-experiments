@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Anonymous star review widget</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+</head>
+<body>
+
+	<style>
+	.star-review-cta, .star-review-stars {
+		display: inline-block;
+		max-width: 20em;
+	}
+
+	.star-review-stars {
+		list-style: none;
+
+	}
+	.star-review-stars-star {
+		display: inline;
+	}
+	.star-review-star-btn {
+		background: none;
+		border:none;
+		color: lightgrey;
+	}
+	.star-review-star-btn:before {
+		content: "\2605";
+		font-size: 2em;
+	}
+	.star-review-star-label {
+		display: none;
+	}
+	.s-selected, .s-considering {
+		color: rgb(209, 0, 139);
+	}
+	.s-considering {
+		opacity: 0.6;
+	}
+	.s-selected.s-not-considering {
+		color: lightgrey;
+	}
+	</style>
+
+	<div class="star-review">
+		<p class="star-review-cta">Seen the film? Rate it:</p>
+		<ol class="star-review-stars">
+			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="1"><span class="star-review-star-label">1 star</span></button></li>
+			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="2"><span class="star-review-star-label">2 star</span></button></li>
+			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="3"><span class="star-review-star-label">3 star</span></button></li>
+			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="4"><span class="star-review-star-label">4 star</span></button></li>
+			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="5"><span class="star-review-star-label">5 star</span></button></li>
+		</ol>
+	</div>
+
+	<script>
+		jQuery(".star-review-star-btn").on("click", function(event) {
+			var $chosenStar = jQuery(event.target);
+			var rating = $chosenStar.data("rating");
+			jQuery(".star-review-stars .star-review-star-btn").removeClass('s-selected');
+		});
+
+		jQuery(".star-review-star-btn").on("mouseover", function(event) {
+			var $chosenStar = jQuery(event.target);
+			var rating = $chosenStar.data("rating");
+
+			$chosenStar.addClass('s-considering');
+			$parentItem = $chosenStar.parents(".star-review-stars-star");
+			$parentItem.prevAll().children('.star-review-star-btn').addClass('s-considering');
+			$parentItem.nextAll().children('.star-review-star-btn').addClass('s-not-considering');
+		});
+
+		jQuery(".star-review-star-btn").on("mouseout", function(event) {
+			var $chosenStar = jQuery(event.target);
+			var rating = $chosenStar.data("rating");
+
+			jQuery('.star-review-star-btn').removeClass('s-considering').removeClass('s-not-considering');
+		});
+	</script>
+</body>
+</html>

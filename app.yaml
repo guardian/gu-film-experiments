@@ -1,5 +1,6 @@
 application: gu-film-experiments
-version: 5
+
+version: 6
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -9,6 +10,10 @@ handlers:
   static_dir: static
 - url: /api/.*
   script: api.app
+- url: /reports/.*
+  script: report_pages.app
+- url: /components/.*
+  script: components.app
 - url: /.*
   script: app.app
 
