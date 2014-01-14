@@ -25,13 +25,16 @@ class BestAndWorstInCinema(webapp2.RequestHandler):
 		self.response.out.write(template.render({'reviews':reviews}))
 
 class StarReview(webapp2.RequestHandler):
-	def get(self):
+	def get(self, film_id):
 		template = jinja_environment.get_template('star-review.html')
 
-		self.response.out.write(template.render({}))
+		template_values = {
+			'film_id' : film_id,
+		}
+		self.response.out.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
-	webapp2.Route(r'/components/star-review', handler=StarReview),
+	webapp2.Route(r'/components/star-review/<film_id>', handler=StarReview),
 	webapp2.Route(r'/components/bestandworstincinema/<quantity>', handler=BestAndWorstInCinema),
 	],
 	debug=True)
