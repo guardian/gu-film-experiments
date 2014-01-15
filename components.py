@@ -5,6 +5,8 @@ import film_reviews
 import logging
 import random
 
+from models import StarReview
+
 jinja_environment = jinja2.Environment(
 	loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
 
@@ -24,17 +26,28 @@ class BestAndWorstInCinema(webapp2.RequestHandler):
 
 		self.response.out.write(template.render({'reviews':reviews}))
 
-class StarReview(webapp2.RequestHandler):
+class StarReviewHandler(webapp2.RequestHandler):
 	def get(self, film_id):
 		template = jinja_environment.get_template('star-review.html')
 
 		template_values = {
 			'film_id' : film_id,
+			'star_values' : range(1, 6)
 		}
+
+		query = StarReview.query(StarReview.movie_id == film_id, StarReview.ip_address == self.request.remote_addr)
+
+		current_rating = query.get()
+
+		if current_rating:
+			template_values.update({'current_rating' :current_rating, 'current_stars' : int(current_rating.stars)})
+
+
+
 		self.response.out.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
-	webapp2.Route(r'/components/star-review/<film_id>', handler=StarReview),
+	webapp2.Route(r'/components/star-review/<film_id>', handler=StarReviewHandler),
 	webapp2.Route(r'/components/bestandworstincinema/<quantity>', handler=BestAndWorstInCinema),
 	],
 	debug=True)

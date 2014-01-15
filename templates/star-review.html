@@ -45,11 +45,9 @@
 	<div class="star-review">
 		<p class="star-review-cta">Seen the film? Rate it:</p>
 		<ol class="star-review-stars">
-			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="1"><span class="star-review-star-label">1 star</span></button></li>
-			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="2"><span class="star-review-star-label">2 star</span></button></li>
-			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="3"><span class="star-review-star-label">3 star</span></button></li>
-			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="4"><span class="star-review-star-label">4 star</span></button></li>
-			<li class="star-review-stars-star"><button class="star-review-star-btn" data-rating="5"><span class="star-review-star-label">5 star</span></button></li>
+			{% for star_value in star_values %}
+			<li class="star-review-stars-star"><button class="star-review-star-btn {% if star_value <= current_stars %}s-selected{% endif %}" data-rating="{{star_value}}" title="{{star_value}} star rating"><span class="star-review-star-label">{{star_value}} star</span></button></li>
+			{% endfor %}
 		</ol>
 	</div>
 
@@ -58,6 +56,10 @@
 			var $chosenStar = jQuery(event.target);
 			var rating = $chosenStar.data("rating");
 			jQuery(".star-review-stars .star-review-star-btn").removeClass('s-selected');
+
+			$chosenStar.addClass('s-selected');
+			$parentItem = $chosenStar.parents(".star-review-stars-star");
+			$parentItem.prevAll().children('.star-review-star-btn').addClass('s-selected');
 		});
 
 		jQuery(".star-review-star-btn").on("mouseover", function(event) {
