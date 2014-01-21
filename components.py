@@ -10,6 +10,13 @@ from models import StarReview, StarReviewSummary
 jinja_environment = jinja2.Environment(
 	loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
 
+def pluralize(num):
+	if num > 1:
+		return 's'
+	return ""
+			
+jinja_environment.filters['pluralize'] = pluralize
+
 class BestAndWorstInCinema(webapp2.RequestHandler):
 	def get(self, quantity):
 

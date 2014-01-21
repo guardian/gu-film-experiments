@@ -52,7 +52,7 @@
 			{% endfor %}
 		</ol>
 		{% if ratings_summary %}
-		<p class="star-review-summary">Rated <span class="star-review-summary-average-rating">{{ratings_summary.average_rating}}</span> stars from <span class="star-review-summary-total-ratings">{{ratings_summary.ratings}}</span> reviews</p>
+		<p class="star-review-summary">Rated <span class="star-review-summary-average-rating">{{ratings_summary.average_rating}}</span> star{{ ratings_summary.average_rating|pluralize }} from <span class="star-review-summary-total-ratings">{{ratings_summary.ratings}}</span> review{{ ratings_summary.ratings|pluralize }}</p>
 		{% else %}
 		<p class="star-review-summary-cta">Be the first to review the film</p>
 		{% endif %}
