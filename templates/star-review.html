@@ -7,7 +7,7 @@
 <body>
 
 	<style>
-	.star-review-cta, .star-review-stars, .star-review-summary {
+	.star-review-cta, .star-review-stars, .star-review-summary, .star-review-summary-cta {
 		display: inline-block;
 		max-width: 16rem;
 		margin-right: 2rem;
@@ -51,9 +51,10 @@
 			<li class="star-review-stars-star"><button class="star-review-star-btn {% if star_value <= current_stars %}s-selected{% endif %}" data-rating="{{star_value}}" title="{{star_value}} star rating"><span class="star-review-star-label">{{star_value}} star</span></button></li>
 			{% endfor %}
 		</ol>
-		<p class="star-review-summary">Average rating from {{ratings_summary.ratings}} reviews: {{ratings_summary.average_rating}} stars</p>
 		{% if ratings_summary and ratings_summary.ratings > 1 %}
 		<p class="star-review-summary">Rated {{ratings_summary.average_rating}} from {{ratings_summary.ratings}}</p>
+		{% else %}
+		<p class="star-review-summary-cta">Be the first to review the film</p>
 		{% endif %}
 	</div>
 
