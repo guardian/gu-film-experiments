@@ -47,6 +47,7 @@ class StarReviewHandler(webapp2.RequestHandler):
 		aggregate_query = StarReviewSummary.query(StarReviewSummary.movie_id == film_id)
 
 		rating_summary = aggregate_query.get()
+		logging.info(rating_summary)
 
 		if rating_summary:
 			template_values["ratings_summary"] = rating_summary

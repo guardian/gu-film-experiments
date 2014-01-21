@@ -93,8 +93,8 @@ class StarReviewHandler(webapp2.RequestHandler):
 
 		data['summary'] = summary_model_to_dict(summary)
 
-		headers.json(self.request)
-		headers.cors(self.request)
+		headers.json(self.response)
+		headers.cors(self.response)
 		self.response.out.write(json.dumps(data))
 
 app = webapp2.WSGIApplication([('/api/star-review', StarReviewHandler)],

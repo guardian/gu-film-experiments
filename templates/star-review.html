@@ -51,8 +51,8 @@
 			<li class="star-review-stars-star"><button class="star-review-star-btn {% if star_value <= current_stars %}s-selected{% endif %}" data-rating="{{star_value}}" title="{{star_value}} star rating"><span class="star-review-star-label">{{star_value}} star</span></button></li>
 			{% endfor %}
 		</ol>
-		{% if ratings_summary and ratings_summary.ratings > 1 %}
-		<p class="star-review-summary">Rated {{ratings_summary.average_rating}} from {{ratings_summary.ratings}}</p>
+		{% if ratings_summary %}
+		<p class="star-review-summary">Rated <span class="star-review-summary-average-rating">{{ratings_summary.average_rating}}</span> stars from <span class="star-review-summary-total-ratings">{{ratings_summary.ratings}}</span> reviews</p>
 		{% else %}
 		<p class="star-review-summary-cta">Be the first to review the film</p>
 		{% endif %}
@@ -70,13 +70,16 @@
 
 			jQuery.ajax({
 				type: "POST",
+				dataType: "json",
 				url: "/api/star-review",
 				data: {
 					movie_id: {{film_id}},
 					stars: rating
 				}
-			}).done(function() {
-				console.log("Posted");
+			}).done(function(data) {
+				console.log(data);
+				jQuery('.star-review-summary-average-rating').text(data.summary.average_rating);
+				jQuery('.star-review-summary-total-ratings').text(data.summary.ratings);
 				jQuery('.star-review-star-btn').removeClass('s-considering').removeClass('s-not-considering');
 			}).fail(function() {
 				console.log("Post failed");
