@@ -42,6 +42,9 @@
 	.s-selected.s-not-considering {
 		color: lightgrey;
 	}
+	.s-hidden {
+		display: none;
+	}
 	</style>
 
 	<div class="star-review">
@@ -51,11 +54,10 @@
 			<li class="star-review-stars-star"><button class="star-review-star-btn {% if star_value <= current_stars %}s-selected{% endif %}" data-rating="{{star_value}}" title="{{star_value}} star rating"><span class="star-review-star-label">{{star_value}} star</span></button></li>
 			{% endfor %}
 		</ol>
-		{% if ratings_summary %}
-		<p class="star-review-summary">Rated <span class="star-review-summary-average-rating">{{ratings_summary.average_rating}}</span> star{{ ratings_summary.average_rating|pluralize }} from <span class="star-review-summary-total-ratings">{{ratings_summary.ratings}}</span> review{{ ratings_summary.ratings|pluralize }}</p>
-		{% else %}
-		<p class="star-review-summary-cta">Be the first to review the film</p>
-		{% endif %}
+
+		<p class="star-review-summary {% if not ratings_summary.ratings %} s-hidden {% endif %}">{{ ratings_summary_text }}</p>
+
+		<p class="star-review-summary-cta {% if ratings_summary.ratings %} s-hidden {% endif %}">Be the first to review the film</p>
 	</div>
 
 	<script>
@@ -81,6 +83,8 @@
 				jQuery('.star-review-summary-average-rating').text(data.summary.average_rating);
 				jQuery('.star-review-summary-total-ratings').text(data.summary.ratings);
 				jQuery('.star-review-star-btn').removeClass('s-considering').removeClass('s-not-considering');
+				jQuery('.star-review-summary-cta').addClass('s-hidden');
+				jQuery('.star-review-summary').removeClass('s-hidden');
 			}).fail(function() {
 				console.log("Post failed");
 			});
