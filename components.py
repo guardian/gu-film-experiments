@@ -5,7 +5,7 @@ import film_reviews
 import logging
 import random
 
-from models import StarReview
+from models import StarReview, StarReviewSummary
 
 jinja_environment = jinja2.Environment(
 	loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates")))
@@ -32,7 +32,9 @@ class StarReviewHandler(webapp2.RequestHandler):
 
 		template_values = {
 			'film_id' : film_id,
-			'star_values' : range(1, 6)
+			'star_values' : range(1, 6),
+			'current_stars' : None,
+			'ratings_summary' : None,
 		}
 
 		query = StarReview.query(StarReview.movie_id == film_id, StarReview.ip_address == self.request.remote_addr)
@@ -42,7 +44,12 @@ class StarReviewHandler(webapp2.RequestHandler):
 		if current_rating:
 			template_values.update({'current_rating' :current_rating, 'current_stars' : int(current_rating.stars)})
 
+		aggregate_query = StarReviewSummary.query(StarReviewSummary.movie_id == film_id)
 
+		rating_summary = aggregate_query.get()
+
+		if rating_summary:
+			template_values["ratings_summary"] = rating_summary
 
 		self.response.out.write(template.render(template_values))
 

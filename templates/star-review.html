@@ -7,13 +7,15 @@
 <body>
 
 	<style>
-	.star-review-cta, .star-review-stars {
+	.star-review-cta, .star-review-stars, .star-review-summary {
 		display: inline-block;
-		max-width: 20em;
+		max-width: 16rem;
+		margin-right: 2rem;
 	}
 
 	.star-review-stars {
 		list-style: none;
+		padding-left: 0;
 
 	}
 	.star-review-stars-star {
@@ -35,7 +37,7 @@
 		color: rgb(209, 0, 139);
 	}
 	.s-considering {
-		opacity: 0.6;
+		opacity: 0.3;
 	}
 	.s-selected.s-not-considering {
 		color: lightgrey;
@@ -49,6 +51,10 @@
 			<li class="star-review-stars-star"><button class="star-review-star-btn {% if star_value <= current_stars %}s-selected{% endif %}" data-rating="{{star_value}}" title="{{star_value}} star rating"><span class="star-review-star-label">{{star_value}} star</span></button></li>
 			{% endfor %}
 		</ol>
+		<p class="star-review-summary">Average rating from {{ratings_summary.ratings}} reviews: {{ratings_summary.average_rating}} stars</p>
+		{% if ratings_summary and ratings_summary.ratings > 1 %}
+		<p class="star-review-summary">Rated {{ratings_summary.average_rating}} from {{ratings_summary.ratings}}</p>
+		{% endif %}
 	</div>
 
 	<script>
@@ -60,6 +66,21 @@
 			$chosenStar.addClass('s-selected');
 			$parentItem = $chosenStar.parents(".star-review-stars-star");
 			$parentItem.prevAll().children('.star-review-star-btn').addClass('s-selected');
+
+			jQuery.ajax({
+				type: "POST",
+				url: "/api/star-review",
+				data: {
+					movie_id: {{film_id}},
+					stars: rating
+				}
+			}).done(function() {
+				console.log("Posted");
+				jQuery('.star-review-star-btn').removeClass('s-considering').removeClass('s-not-considering');
+			}).fail(function() {
+				console.log("Post failed");
+			});
+
 		});
 
 		jQuery(".star-review-star-btn").on("mouseover", function(event) {
