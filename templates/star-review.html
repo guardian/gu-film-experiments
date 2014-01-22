@@ -3,61 +3,10 @@
 <head>
 	<title>Anonymous star review widget</title>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="/static/css/star-review.css">
 </head>
 <body>
-
-	<style>
-	.star-review-cta, 
-	.star-review-stars, 
-	.star-review-summary, 
-	.star-review-summary-cta,
-	.star-review-status {
-		display: inline-block;
-		max-width: 16rem;
-		margin-right: 2rem;
-	}
-	.star-review-status {
-		background-color: #F7D2CC;
-		font-weight: bold;
-		color: #555;
-		padding: 0.5rem;
-		border-radius: 5px;
-	}
-	.star-review-stars {
-		list-style: none;
-		padding-left: 0;
-
-	}
-	.star-review-stars-star {
-		display: inline;
-	}
-	.star-review-star-btn {
-		background: none;
-		border:none;
-		color: lightgrey;
-	}
-	.star-review-star-btn:before {
-		content: "\2605";
-		font-size: 2em;
-	}
-	.star-review-star-label {
-		display: none;
-	}
-	.s-selected, .s-considering {
-		color: rgb(209, 0, 139);
-	}
-	.s-considering {
-		opacity: 0.3;
-	}
-	.s-selected.s-not-considering {
-		color: lightgrey;
-	}
-	.s-hidden {
-		display: none;
-	}
-	</style>
-
-	<div class="star-review">
+	<div class="star-review" data-movie-id="{{ film_id }}">
 		<p class="star-review-cta">Seen the film? Rate it:</p>
 		<ol class="star-review-stars">
 			{% for star_value in star_values %}
@@ -70,54 +19,6 @@
 		<p class="star-review-summary-cta {% if ratings_summary.ratings %} s-hidden {% endif %}">Be the first to review the film</p>
 		<p class="star-review-status s-hidden">Sorry we failed to save your rating. Please try again</p>
 	</div>
-
-	<script>
-		jQuery(".star-review-star-btn").on("click", function(event) {
-			var $chosenStar = jQuery(event.target);
-			var rating = $chosenStar.data("rating");
-			jQuery(".star-review-stars .star-review-star-btn").removeClass('s-selected');
-
-			$chosenStar.addClass('s-selected');
-			$parentItem = $chosenStar.parents(".star-review-stars-star");
-			$parentItem.prevAll().children('.star-review-star-btn').addClass('s-selected');
-
-			jQuery.ajax({
-				type: "POST",
-				dataType: "json",
-				url: "/api/star-review",
-				data: {
-					movie_id: {{film_id}},
-					stars: rating
-				}
-			}).done(function(data) {
-				jQuery(".star-review-summary ").text(data.ratings_summary_text);	
-				jQuery('.star-review-star-btn').removeClass('s-considering').removeClass('s-not-considering');
-				jQuery('.star-review-summary-cta').addClass('s-hidden');
-				jQuery('.star-review-summary').removeClass('s-hidden');
-
-			}).fail(function() {
-				jQuery('.star-review-status').removeClass('s-hidden').show().fadeOut(3000);
-
-			});
-
-		});
-
-		jQuery(".star-review-star-btn").on("mouseover", function(event) {
-			var $chosenStar = jQuery(event.target);
-			var rating = $chosenStar.data("rating");
-
-			$chosenStar.addClass('s-considering');
-			$parentItem = $chosenStar.parents(".star-review-stars-star");
-			$parentItem.prevAll().children('.star-review-star-btn').addClass('s-considering');
-			$parentItem.nextAll().children('.star-review-star-btn').addClass('s-not-considering');
-		});
-
-		jQuery(".star-review-star-btn").on("mouseout", function(event) {
-			var $chosenStar = jQuery(event.target);
-			var rating = $chosenStar.data("rating");
-
-			jQuery('.star-review-star-btn').removeClass('s-considering').removeClass('s-not-considering');
-		});
-	</script>
+	<script>jQuery.getScript( "/static/js/star-review-behaviour.js")</script>
 </body>
 </html>

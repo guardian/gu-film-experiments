@@ -5,6 +5,7 @@ import film_reviews
 import logging
 import random
 import ratings
+import headers
 
 from models import StarReview, StarReviewSummary
 
@@ -57,7 +58,7 @@ class StarReviewHandler(webapp2.RequestHandler):
 			template_values["ratings_summary"] = rating_summary
 		template_values["ratings_summary_text"] = ratings.ratings_summary_text(template_values["ratings_summary"])
 
-
+		headers.cors(self.response)
 		self.response.out.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
