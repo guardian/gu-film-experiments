@@ -7,6 +7,7 @@ import logging
 from urllib import quote, urlencode
 from collections import namedtuple
 from operator import attrgetter
+import ratings
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
@@ -49,7 +50,7 @@ class StarReviewHandler(webapp2.RequestHandler):
 			'movie_id' : movie_id
 			}
 
-		ratings = []
+		user_ratings = []
 
 		query = StarReview.query(StarReview.movie_id == movie_id, StarReview.ip_address == self.request.remote_addr)
 
@@ -57,7 +58,7 @@ class StarReviewHandler(webapp2.RequestHandler):
 			StarReview(movie_id=movie_id, stars=stars, ip_address=self.request.remote_addr).put()
 
 			# Screw you eventual consistency!
-			ratings.append(int(stars))
+			user_ratings.append(int(stars))
 		else:
 			current_review = query.iter().next()
 			current_review.stars = stars
@@ -65,7 +66,7 @@ class StarReviewHandler(webapp2.RequestHandler):
 
 		reviews = StarReview.query(StarReview.movie_id == movie_id)
 
-		ratings.extend([review.stars for review in reviews])
+		user_ratings.extend([review.stars for review in reviews])
 
 		summary_key = ndb.Key('StarReviewSummary', movie_id)
 
@@ -74,25 +75,25 @@ class StarReviewHandler(webapp2.RequestHandler):
 		if not summary:
 			summary = StarReviewSummary(id=movie_id, movie_id=movie_id, average_rating=stars, max_rating=stars, min_rating=stars, ratings=1)
 		
-		if len(ratings) > 1 and not summary:
+		if len(user_ratings) > 1 and not summary:
 			# Recover from previous failure to generate summary			
 			summary = StarReviewSummary(id=movie_id, movie_id=movie_id,
-				average_rating = sum(ratings) / len(ratings),
-				max_rating = max(ratings),
-				min_rating = min(ratings),
-				ratings = len(ratings))
+				average_rating = sum(user_ratings) / len(user_ratings),
+				max_rating = max(user_ratings),
+				min_rating = min(user_ratings),
+				ratings = len(user_ratings))
 
 		if summary:
-			average_rating = int(sum(ratings) / len(ratings))
+			average_rating = int(sum(user_ratings) / len(user_ratings))
 			summary.average_rating = average_rating
-			summary.max_rating = max(ratings)
-			summary.min_rating = min(ratings)
-			summary.ratings = len(ratings)
+			summary.max_rating = max(user_ratings)
+			summary.min_rating = min(user_ratings)
+			summary.ratings = len(user_ratings)
 
 		summary.put()
 
 		data['summary'] = summary_model_to_dict(summary)
-
+		data['ratings_summary_text'] = ratings.ratings_summary_text(summary)
 		headers.json(self.response)
 		headers.cors(self.response)
 		self.response.out.write(json.dumps(data))

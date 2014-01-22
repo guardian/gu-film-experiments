@@ -7,12 +7,22 @@
 <body>
 
 	<style>
-	.star-review-cta, .star-review-stars, .star-review-summary, .star-review-summary-cta {
+	.star-review-cta, 
+	.star-review-stars, 
+	.star-review-summary, 
+	.star-review-summary-cta,
+	.star-review-status {
 		display: inline-block;
 		max-width: 16rem;
 		margin-right: 2rem;
 	}
-
+	.star-review-status {
+		background-color: #F7D2CC;
+		font-weight: bold;
+		color: #555;
+		padding: 0.5rem;
+		border-radius: 5px;
+	}
 	.star-review-stars {
 		list-style: none;
 		padding-left: 0;
@@ -58,6 +68,7 @@
 		<p class="star-review-summary {% if not ratings_summary.ratings %} s-hidden {% endif %}">{{ ratings_summary_text }}</p>
 
 		<p class="star-review-summary-cta {% if ratings_summary.ratings %} s-hidden {% endif %}">Be the first to review the film</p>
+		<p class="star-review-status s-hidden">Sorry we failed to save your rating. Please try again</p>
 	</div>
 
 	<script>
@@ -79,14 +90,14 @@
 					stars: rating
 				}
 			}).done(function(data) {
-				console.log(data);
-				jQuery('.star-review-summary-average-rating').text(data.summary.average_rating);
-				jQuery('.star-review-summary-total-ratings').text(data.summary.ratings);
+				jQuery(".star-review-summary ").text(data.ratings_summary_text);	
 				jQuery('.star-review-star-btn').removeClass('s-considering').removeClass('s-not-considering');
 				jQuery('.star-review-summary-cta').addClass('s-hidden');
 				jQuery('.star-review-summary').removeClass('s-hidden');
+
 			}).fail(function() {
-				console.log("Post failed");
+				jQuery('.star-review-status').removeClass('s-hidden').show().fadeOut(3000);
+
 			});
 
 		});
