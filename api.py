@@ -57,14 +57,16 @@ class StarReviewHandler(webapp2.RequestHandler):
 		if not query.iter().has_next():
 			StarReview(movie_id=movie_id, stars=stars, ip_address=self.request.remote_addr).put()
 
-			# Screw you eventual consistency!
-			user_ratings.append(int(stars))
 		else:
 			current_review = query.iter().next()
 			current_review.stars = stars
 			current_review.put()
 
 		reviews = StarReview.query(StarReview.movie_id == movie_id)
+
+		if not reviews:
+			# Screw you eventual consistency!
+			user_ratings.append(int(stars))
 
 		user_ratings.extend([review.stars for review in reviews])
 

@@ -1,0 +1,48 @@
+.star-review-cta, 
+.star-review-stars, 
+.star-review-summary, 
+.star-review-summary-cta,
+.star-review-status {
+	display: inline-block;
+	max-width: 16rem;
+	margin-right: 2rem;
+}
+.star-review-status {
+	background-color: #F7D2CC;
+	font-weight: bold;
+	color: #555;
+	padding: 0.5rem;
+	border-radius: 5px;
+}
+.star-review-stars {
+	list-style: none;
+	padding-left: 0;
+
+}
+.star-review-stars-star {
+	display: inline;
+}
+.star-review-star-btn {
+	background: none;
+	border:none;
+	color: lightgrey;
+}
+.star-review-star-btn:before {
+	content: "\2605";
+	font-size: 2em;
+}
+.star-review-star-label {
+	display: none;
+}
+.s-selected, .s-considering {
+	color: rgb(209, 0, 139);
+}
+.s-considering {
+	opacity: 0.3;
+}
+.s-selected.s-not-considering {
+	color: lightgrey;
+}
+.s-hidden {
+	display: none;
+}
