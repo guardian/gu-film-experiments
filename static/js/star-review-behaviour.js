@@ -10,7 +10,7 @@ jQuery(".star-review-star-btn").on("click", function(event) {
 	jQuery.ajax({
 		type: "POST",
 		dataType: "json",
-		url: "http://7.gu-film-experiments.appspot.com/api/star-review",
+		url: "http://gu-film-experiments.appspot.com/api/star-review",
 		data: {
 			movie_id: film_id,
 			stars: rating
