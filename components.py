@@ -1,4 +1,5 @@
 import os
+import json
 import jinja2
 import webapp2
 import film_reviews
@@ -6,6 +7,7 @@ import logging
 import random
 import ratings
 import headers
+import content_api
 
 from models import StarReview, StarReviewSummary
 
@@ -61,8 +63,69 @@ class StarReviewHandler(webapp2.RequestHandler):
 		headers.cors(self.response)
 		self.response.out.write(template.render(template_values))
 
+class ReviewsByGenreHandler(webapp2.RequestHandler):
+	def get(self):
+		template = jinja_environment.get_template('reviews-by-genre.html')
+
+		params = { 
+			'section' : 'film',
+			'page-size' : '50',
+			'show-fields' : 'headline,thumbnail,byline,starRating',
+		}
+
+		def trails_from_results(content):
+			if not content:
+				return []
+
+			data = json.loads(content)
+			results =  data.get("response", {}).get("results", [])
+
+			random.shuffle(results)
+
+			return [r for r in results if "thumbnail" in r["fields"]][:3]
+
+
+
+		template_values = {
+		}
+
+		def grab_reviews(genre_tag):
+			search_params = {
+				'tag' : "tone/reviews,%s" % genre_tag,
+			}
+			search_params.update(params)
+			return trails_from_results(content_api.search(search_params))
+
+		template_values['reviews'] =[
+			{
+				"heading" : "Science fiction",
+				"reviews" : grab_reviews("film/sciencefictionandfantasy"),
+				"tag_name" : "film/sciencefictionandfantasy",
+			},
+			{
+				"heading" : "Comedy",
+				"reviews" : grab_reviews("film/comedy"),
+				"tag_name" : "film/comedy",
+			},
+			{
+				"heading" : "Drama",
+				"reviews" : grab_reviews("film/drama"),
+				"tag_name" : "film/drama",
+			},]
+
+		for key, genre_tag in [("drama", "film/drama"), ("comedy", "film/comedy"), ('scifi', "film/sciencefictionandfantasy"),]:
+			search_params = {
+				'tag' : "tone/reviews,%s" % genre_tag,
+			}
+			search_params.update(params)
+			template_values[key] = trails_from_results(content_api.search(search_params))
+
+		headers.cors(self.response)
+		self.response.out.write(template.render(template_values))
+
 app = webapp2.WSGIApplication([
 	webapp2.Route(r'/components/star-review/<film_id>', handler=StarReviewHandler),
 	webapp2.Route(r'/components/bestandworstincinema/<quantity>', handler=BestAndWorstInCinema),
+	webapp2.Route(r'/components/front/genre-reviews', handler=ReviewsByGenreHandler),
 	],
 	debug=True)

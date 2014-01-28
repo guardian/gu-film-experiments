@@ -56,3 +56,41 @@ def read_all(params=None):
     results = [r for r in results if 'starRating' in r.get('fields', {}) and 'thumbnail' in r.get('fields', {})]
     return results
 
+def read(content_id, params = None):
+
+    url = "http://%s%s" % (CONTENT_API_HOST, content_id)
+
+    if params:
+        url = url + "?" + urllib.urlencode(params)
+
+    cached_data = memcache.get(url)
+
+    if cached_data:
+        return cached_data
+
+    result = fetch(url)
+
+    if not result.status_code == 200:
+        logging.warning("Content API read failed: %d" % result.status_code)
+        return None
+
+    memcache.set(url, result.content, time = 60 * 15)
+
+    return result.content
+
+def search(query):
+    url = "http://content.guardianapis.com/search?%s" % urllib.urlencode(query)
+
+    cached_data = memcache.get(url)
+
+    if cached_data:
+        return cached_data
+
+    result = fetch(url)
+
+    if not result.status_code == 200:
+        logging.warning("Failed to search API: %s" % url)
+        return None
+    
+    memcache.set(url, result.content, time=60*3)
+    return result.content

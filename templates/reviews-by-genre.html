@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf8">
+	</head>
+<body>
+
+<div class="reviews-by-genre">
+
+<style>
+	.film-front-review-entry {
+		margin-bottom: 1rem;
+	}
+	.film-front-review-entry-star-rating {
+		background-color: #D1008B;
+	}
+	.film-front-reviews-link {
+		margin-bottom: 1rem;
+	}
+</style>
+
+{% for genre in reviews %}
+<div class="film trail-header">
+<h2>{{genre.heading}} reviews</h2>
+</div>
+
+<ul class="tri trail trailblock">
+	{% for review in genre.reviews %}
+	<li class="film-front-review-entry">
+		<p><a href="{{review.webUrl}}"><img src="{{review.fields.thumbnail}}"></a></p>
+		<p>{{review.fields.headline}}</p>
+		{% if review.fields.starRating %}
+		<p><img class="film-front-review-entry-star-rating" src="http://static.guim.co.uk/static/common/images/star-ratings/content/{{review.fields.starRating}}.png" title="Rated {{review.fields.starRating}}"></p>
+		{% endif %}
+		<p><strong>{{review.fields.byline}}</strong></p>
+	</li>
+	{% endfor %}
+</ul>
+<p class="film-front-reviews-link"><a href="http://www.theguardian.com/{{genre.tag_name}}+tone/reviews">All {{genre.heading|lower}} reviews</a></p>
+{% endfor %}
+
+</div>
+</body>
+</html>
