@@ -98,9 +98,9 @@ class ReviewsByGenreHandler(webapp2.RequestHandler):
 
 		template_values['reviews'] =[
 			{
-				"heading" : "Science fiction",
-				"reviews" : grab_reviews("film/sciencefictionandfantasy"),
-				"tag_name" : "film/sciencefictionandfantasy",
+				"heading" : "Drama",
+				"reviews" : grab_reviews("film/drama"),
+				"tag_name" : "film/drama",
 			},
 			{
 				"heading" : "Comedy",
@@ -108,17 +108,10 @@ class ReviewsByGenreHandler(webapp2.RequestHandler):
 				"tag_name" : "film/comedy",
 			},
 			{
-				"heading" : "Drama",
-				"reviews" : grab_reviews("film/drama"),
-				"tag_name" : "film/drama",
+				"heading" : "Science fiction",
+				"reviews" : grab_reviews("film/sciencefictionandfantasy"),
+				"tag_name" : "film/sciencefictionandfantasy",
 			},]
-
-		for key, genre_tag in [("drama", "film/drama"), ("comedy", "film/comedy"), ('scifi', "film/sciencefictionandfantasy"),]:
-			search_params = {
-				'tag' : "tone/reviews,%s" % genre_tag,
-			}
-			search_params.update(params)
-			template_values[key] = trails_from_results(content_api.search(search_params))
 
 		headers.cors(self.response)
 		self.response.out.write(template.render(template_values))
