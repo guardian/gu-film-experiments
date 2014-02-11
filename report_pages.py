@@ -21,12 +21,28 @@ class FilmReports(webapp2.RequestHandler):
 	def get(self):
 		template = jinja_environment.get_template('reports.html')
 
-		summaries = sorted([s for s in StarReviewSummary.query()], key=attrgetter('average_rating'), reverse=True)
+		summaries = StarReviewSummary.query().order(-StarReviewSummary.average_rating, -StarReviewSummary.ratings)
 
 		template_values = {"reviews" : summaries}
 
 		self.response.out.write(template.render(template_values))
 
+class EngagementReportHandler(webapp2.RequestHandler):
+	def get(self):
+		template = jinja_environment.get_template('engagement-report.html')
+
+		ratings = StarReview.query().count()
+		unique_ip_addresses = StarReview.query(projection=["ip_address"], distinct=True).count()
+
+		template_values = {
+			'ratings' : ratings,
+			'ip_addresses' : unique_ip_addresses,
+		}
+
+		self.response.out.write(template.render(template_values))
+
+
 app = webapp2.WSGIApplication([webapp2.Route(r'/reports/film', handler=FilmReports),
+	webapp2.Route(r'/reports/film/engagement', handler=EngagementReportHandler),
     ],
     debug=True)

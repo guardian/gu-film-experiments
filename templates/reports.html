@@ -19,7 +19,7 @@
 			<tbody>
 				{% for review_summary in reviews %}
 				<tr>
-					<td>{{review_summary.movie_id}}</td>
+					<td><a href="https://www.google.com/search?as_sitesearch=theguardian.com&q={{review_summary.movie_id}}">{{review_summary.movie_id}}</a></td>
 					<td>{{review_summary.average_rating}}</td>
 					<td>{{review_summary.max_rating}}</td>
 					<td>{{review_summary.min_rating}}</td>
