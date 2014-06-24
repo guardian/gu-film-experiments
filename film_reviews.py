@@ -17,8 +17,10 @@ def filtered_reviews(max_or_min=None,star_value=None):
         logging.info("memcache doesn't have query %s " % star_query)
         all_reviews = memcache.get('data_reviews')
         if not all_reviews:
-            logging.info('memcache is empty - calling the content api')
+            logging.debug('memcache is empty - calling the content api')
             all_reviews = content_api.read_all()
+            if not all_reviews:
+                return []
             memcache.set('data_reviews', all_reviews, 15*60)
         if min:
             #logging.info('calling the min function')

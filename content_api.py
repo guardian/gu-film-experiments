@@ -2,17 +2,30 @@ import urlparse
 import urllib
 import logging
 import json
+import datetime
+
 from google.appengine.api import memcache
 
 from google.appengine.api.urlfetch import fetch
 
-CONTENT_API_HOST = 'content.guardianapis.com'
+import configuration
+
+last_30_days = (datetime.date.today() + datetime.timedelta(days=-30)).isoformat()
+
+CONTENT_API_HOST = configuration.lookup('CONTENT_API_HOST', 'content.guardianapis.com')
+API_KEY = configuration.lookup('API_KEY')
 SEARCH = 'search'
-PARAMS = {'tag': 'film,tone/reviews',
-          'show-fields': 'headline,thumbnail,trailText,star-rating',
-          'show-tags': 'all',
-          'date-id': 'date/last30days',
-          'page': "1"}
+PARAMS = {
+    'section' : 'film',
+    'tag': 'tone/reviews',
+    'show-fields': 'headline,thumbnail,trailText,star-rating',
+    'show-tags': 'all',
+    'from-date': last_30_days,
+    'page': "1",
+    }
+
+if API_KEY:
+    PARAMS['api-key'] = API_KEY
 
 def read_all(params=None):
     if not params:
@@ -41,17 +54,17 @@ def read_all(params=None):
         params['page'] = str(1+int(currentPage))
         encoded_url = url + "?" + urllib.urlencode(params)
         result = fetch(encoded_url)
-        logging.info(encoded_url)
+        #logging.info(encoded_url)
         if not result.status_code == 200:
             logging.warning("Content API read failed %d" % result.status_code)
-            return None
+            return results
         content = json.loads(result.content)
         response = content['response']
         if not 'response' in content:
             logging.info('no response')
-            return None
+            return results
         currentPage = response['currentPage']
-        logging.info(currentPage)
+        #logging.info(currentPage)
         results.extend(response['results'])
     results = [r for r in results if 'starRating' in r.get('fields', {}) and 'thumbnail' in r.get('fields', {})]
     return results
@@ -79,7 +92,7 @@ def read(content_id, params = None):
     return result.content
 
 def search(query):
-    url = "http://content.guardianapis.com/search?%s" % urllib.urlencode(query)
+    url = "http://%s/search?%s" % (CONTENT_API_HOST, urllib.urlencode(query))
 
     cached_data = memcache.get(url)
 

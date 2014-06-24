@@ -1,6 +1,6 @@
 application: gu-film-experiments
 
-version: 12
+version: 16
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -20,3 +20,6 @@ handlers:
 libraries:
 - name: jinja2
   version: latest
+
+builtins:
+- remote_api: on  
